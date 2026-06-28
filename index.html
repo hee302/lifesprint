@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>라이프 스프린트 · Life Sprint</title>
+<script src="https://js.puter.com/v2/"></script>
+<style>
+  :root{
+    --bg:#f3f6fc; --card:#ffffff; --ink:#1f2a44; --sub:#6b7a99;
+    --brand:#2f6bff; --brand-d:#1f4fd6; --line:#e6ecf7;
+    --ok:#1eb980; --warn:#f0a020; --chip:#eef3ff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
+    background:var(--bg);color:var(--ink);}
+  a{color:var(--brand)}
+  header{background:linear-gradient(135deg,#2f6bff,#5b8bff);color:#fff;padding:22px 18px;}
+  .wrap{max-width:960px;margin:0 auto;padding:0 16px;}
+  header .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .logo{display:flex;align-items:center;gap:12px}
+  .logo .mark{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.18);
+    display:grid;place-items:center;font-size:24px}
+  .logo h1{margin:0;font-size:22px;font-weight:800;letter-spacing:-.5px}
+  .logo p{margin:2px 0 0;font-size:12.5px;opacity:.9}
+  .week{background:rgba(255,255,255,.16);padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600}
+  nav{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+  nav .wrap{display:flex;gap:4px;overflow-x:auto}
+  .tab{border:none;background:none;padding:14px 16px;font-size:14.5px;font-weight:600;color:var(--sub);
+    cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+  .tab.active{color:var(--brand);border-color:var(--brand)}
+  main{padding:22px 0 60px}
+  .panel{display:none;animation:fade .25s ease}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px;
+    box-shadow:0 2px 10px rgba(31,42,68,.04)}
+  h2{font-size:17px;margin:0 0 4px}
+  .muted{color:var(--sub);font-size:13px;margin:0 0 14px}
+  label{display:block;font-size:12.5px;color:var(--sub);margin:0 0 5px;font-weight:600}
+  input[type=text],textarea,select{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+    font-size:14px;font-family:inherit;background:#fbfcff;color:var(--ink)}
+  textarea{resize:vertical;min-height:64px}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .row>div{flex:1;min-width:120px}
+  .btn{background:var(--brand);color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:14px;
+    font-weight:700;cursor:pointer}
+  .btn:hover{background:var(--brand-d)}
+  .btn.ghost{background:var(--chip);color:var(--brand)}
+  .btn.sm{padding:6px 10px;font-size:12.5px}
+  .stat{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:14px}
+  .stat .box{flex:1;min-width:120px;background:var(--chip);border-radius:12px;padding:12px 14px}
+  .stat .box b{display:block;font-size:24px;color:var(--brand)}
+  .stat .box span{font-size:12px;color:var(--sub)}
+  .task{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--line);border-radius:12px;
+    padding:12px;margin-bottom:8px}
+  .task.done{opacity:.55}
+  .task.done .t-title{text-decoration:line-through}
+  .task .pts{flex:none;width:30px;height:30px;border-radius:8px;background:var(--brand);color:#fff;
+    display:grid;place-items:center;font-weight:800;font-size:14px}
+  .t-body{flex:1}
+  .t-title{font-weight:700;font-size:14.5px}
+  .t-dod{font-size:12.5px;color:var(--sub);margin-top:2px}
+  .x{border:none;background:none;color:#c2ccde;cursor:pointer;font-size:18px;line-height:1}
+  .empty{color:var(--sub);font-size:13.5px;text-align:center;padding:18px 0}
+  .log-item{border-left:3px solid var(--brand);padding:8px 12px;margin-bottom:8px;background:#fbfcff;border-radius:8px}
+  .log-item .d{font-size:12px;color:var(--brand);font-weight:700}
+  .log-item p{margin:4px 0 0;font-size:13.5px;white-space:pre-wrap}
+  /* chat */
+  #chat{height:380px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;padding:14px;background:#fbfcff}
+  .msg{max-width:84%;padding:10px 13px;border-radius:14px;margin-bottom:10px;font-size:14px;line-height:1.5;white-space:pre-wrap}
+  .msg.user{background:var(--brand);color:#fff;margin-left:auto;border-bottom-right-radius:4px}
+  .msg.bot{background:#eef2f9;color:var(--ink);border-bottom-left-radius:4px}
+  .chat-in{display:flex;gap:8px;margin-top:10px}
+  .chip-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .chip{background:var(--chip);border:none;color:var(--brand);border-radius:999px;padding:7px 12px;font-size:12.5px;
+    cursor:pointer;font-weight:600}
+  .bar{height:10px;background:var(--line);border-radius:999px;overflow:hidden;margin-top:6px}
+  .bar>i{display:block;height:100%;background:var(--ok)}
+  footer{color:var(--sub);font-size:12px;text-align:center;padding:24px}
+  .pill{display:inline-block;background:var(--chip);color:var(--brand);border-radius:999px;padding:3px 9px;font-size:11.5px;font-weight:700}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="logo">
+      <div class="mark">🚀</div>
+      <div>
+        <h1>라이프 스프린트</h1>
+        <p>애자일 스프린트로 일상을 계획·점검·회고하는 성장 코치</p>
+      </div>
+    </div>
+    <div class="week" id="weekLabel">이번 주 스프린트</div>
+  </div>
+</header>
+
+<nav>
+  <div class="wrap">
+    <button class="tab active" data-tab="board">📋 스프린트 보드</button>
+    <button class="tab" data-tab="standup">☀️ 데일리 스탠드업</button>
+    <button class="tab" data-tab="retro">🔄 주간 회고(KPT)</button>
+    <button class="tab" data-tab="coach">🤖 AI 코치</button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- BOARD -->
+  <section class="panel active" id="board">
+    <div class="card">
+      <h2>이번 주 백로그에 태스크 추가</h2>
+      <p class="muted">목표를 작은 태스크로 쪼개고, 노력의 크기를 <b>에너지 포인트</b>로 추정하세요. 완료 기준(DoD)은 "끝"을 측정 가능하게 적습니다.</p>
+      <div class="row">
+        <div style="flex:2"><label>태스크</label><input id="tTitle" type="text" placeholder="예: 수·금 30분 달리기"></div>
+        <div><label>에너지 포인트</label>
+          <select id="tPts"><option value="1">1 · 아주 가벼움</option><option value="2">2 · 가벼움</option>
+          <option value="3" selected>3 · 보통</option><option value="5">5 · 부담</option></select></div>
+      </div>
+      <div style="margin-top:10px"><label>완료 기준(DoD)</label><input id="tDod" type="text" placeholder="예: 각 회 30분 완주"></div>
+      <div style="margin-top:12px"><button class="btn" onclick="addTask()">+ 추가</button></div>
+    </div>
+
+    <div class="card">
+      <div class="stat">
+        <div class="box"><b id="sCommit">0</b><span>계획 포인트</span></div>
+        <div class="box"><b id="sDone">0</b><span>완료 포인트 (속도)</span></div>
+        <div class="box"><b id="sRate">0%</b><span>달성률</span>
+          <div class="bar"><i id="sBar" style="width:0%"></i></div></div>
+      </div>
+      <div id="taskList"></div>
+    </div>
+  </section>
+
+  <!-- STANDUP -->
+  <section class="panel" id="standup">
+    <div class="card">
+      <h2>오늘의 데일리 스탠드업 <span class="pill" id="todayPill"></span></h2>
+      <p class="muted">매일 딱 세 가지만. 짧게 점검하고 막힌 건 빨리 풀어요.</p>
+      <label>① 어제 한 일</label><textarea id="suY" placeholder="어제 완료한 것"></textarea>
+      <label style="margin-top:10px">② 오늘 할 일</label><textarea id="suT" placeholder="오늘 집중할 것"></textarea>
+      <label style="margin-top:10px">③ 막힌 것(블로커)</label><textarea id="suB" placeholder="진행을 막는 것 (없으면 비워두세요)"></textarea>
+      <div style="margin-top:12px"><button class="btn" onclick="saveStandup()">기록 저장</button></div>
+    </div>
+    <div class="card">
+      <h2>스탠드업 기록</h2>
+      <div id="suList"></div>
+    </div>
+  </section>
+
+  <!-- RETRO -->
+  <section class="panel" id="retro">
+    <div class="card">
+      <h2>주간 회고 — KPT</h2>
+      <p class="muted">한 주를 돌아봅니다. 비난이 아니라 다음을 개선하기 위한 시간이에요.</p>
+      <label>Keep · 계속할 것</label><textarea id="rK" placeholder="잘된 것, 유지하고 싶은 것"></textarea>
+      <label style="margin-top:10px">Problem · 문제였던 것</label><textarea id="rP" placeholder="아쉬웠던 것, 막혔던 것"></textarea>
+      <label style="margin-top:10px">Try · 다음에 시도할 것</label><textarea id="rT" placeholder="다음 스프린트에 적용할 한 가지"></textarea>
+      <div style="margin-top:12px"><button class="btn" onclick="saveRetro()">회고 저장</button>
+        <button class="btn ghost" onclick="aiRetro()">🤖 AI에게 회고 도움 받기</button></div>
+    </div>
+    <div class="card">
+      <h2>지난 회고</h2>
+      <div id="rList"></div>
+    </div>
+  </section>
+
+  <!-- COACH -->
+  <section class="panel" id="coach">
+    <div class="card">
+      <h2>AI 코치와 대화</h2>
+      <p class="muted">스프린트 계획, 우선순위, 동기부여까지 — 라이프 스프린트 코치가 대화로 도와줘요. <br>
+        <span style="font-size:12px">※ 처음 보낼 때 무료 Puter 로그인 창이 한 번 떠요(API 키 불필요).</span></p>
+      <div id="chat"></div>
+      <div class="chip-row">
+        <button class="chip" onclick="quick('이번 주 스프린트 계획을 세워줘')">이번 주 계획</button>
+        <button class="chip" onclick="quick('오늘 데일리 스탠드업 도와줘')">데일리 스탠드업</button>
+        <button class="chip" onclick="quick('할 일이 너무 많아, 우선순위 정리 도와줘')">우선순위 정리</button>
+      </div>
+      <div class="chat-in">
+        <input id="chatIn" type="text" placeholder="메시지를 입력하세요…" onkeydown="if(event.key==='Enter')send()">
+        <button class="btn" onclick="send()" id="sendBtn">보내기</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>라이프 스프린트 · 애자일 방식으로 돕는 개인 성장 AI 에이전트 · 데이터는 이 브라우저에만 저장됩니다.</footer>
+
+<script>
+/* ---------- 이번 주(월~일) 계산 ---------- */
+function weekRange(){
+  const now=new Date(); const day=(now.getDay()+6)%7; // 월=0
+  const mon=new Date(now); mon.setDate(now.getDate()-day);
+  const sun=new Date(mon); sun.setDate(mon.getDate()+6);
+  const f=d=>`${d.getMonth()+1}/${d.getDate()}`;
+  const wd=['일','월','화','수','목','금','토'][now.getDay()];
+  return {label:`이번 주 스프린트 · ${f(mon)}~${f(sun)}`, today:`${f(now)}(${wd})`};
+}
+const wr=weekRange();
+document.getElementById('weekLabel').textContent=wr.label;
+document.getElementById('todayPill').textContent=wr.today;
+
+/* ---------- 저장소 ---------- */
+const DB={
+  get:k=>JSON.parse(localStorage.getItem('ls_'+k)||'null'),
+  set:(k,v)=>localStorage.setItem('ls_'+k,JSON.stringify(v))
+};
+let tasks=DB.get('tasks')||[];
+let standups=DB.get('standups')||[];
+let retros=DB.get('retros')||[];
+
+/* ---------- 탭 ---------- */
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  document.getElementById(t.dataset.tab).classList.add('active');
+});
+
+/* ---------- 보드 ---------- */
+function addTask(){
+  const title=document.getElementById('tTitle').value.trim();
+  if(!title)return;
+  tasks.push({id:Date.now(),title,pts:+document.getElementById('tPts').value,
+    dod:document.getElementById('tDod').value.trim(),done:false});
+  DB.set('tasks',tasks);
+  document.getElementById('tTitle').value='';document.getElementById('tDod').value='';
+  renderBoard();
+}
+function toggleTask(id){const t=tasks.find(x=>x.id===id);t.done=!t.done;DB.set('tasks',tasks);renderBoard();}
+function delTask(id){tasks=tasks.filter(x=>x.id!==id);DB.set('tasks',tasks);renderBoard();}
+function renderBoard(){
+  const list=document.getElementById('taskList');
+  const commit=tasks.reduce((a,b)=>a+b.pts,0);
+  const done=tasks.filter(t=>t.done).reduce((a,b)=>a+b.pts,0);
+  const rate=commit?Math.round(done/commit*100):0;
+  sCommit.textContent=commit;sDone.textContent=done;sRate.textContent=rate+'%';sBar.style.width=rate+'%';
+  if(commit>14){sCommit.style.color='var(--warn)';} else {sCommit.style.color='var(--brand)';}
+  list.innerHTML=tasks.length?tasks.map(t=>`
+    <div class="task ${t.done?'done':''}">
+      <div class="pts">${t.pts}</div>
+      <div class="t-body">
+        <div class="t-title">${esc(t.title)}</div>
+        ${t.dod?`<div class="t-dod">완료기준: ${esc(t.dod)}</div>`:''}
+      </div>
+      <button class="btn ghost sm" onclick="toggleTask(${t.id})">${t.done?'되돌리기':'완료'}</button>
+      <button class="x" onclick="delTask(${t.id})">×</button>
+    </div>`).join(''):'<div class="empty">아직 태스크가 없어요. 위에서 이번 주 할 일을 추가해 보세요.</div>';
+  if(commit>14){list.insertAdjacentHTML('afterbegin','<div class="t-dod" style="color:var(--warn);margin-bottom:8px">⚠ 계획 포인트가 많아요(15+). 무리하지 않게 덜어내는 걸 고려하세요.</div>');}
+}
+
+/* ---------- 스탠드업 ---------- */
+function saveStandup(){
+  const y=suY.value.trim(),t=suT.value.trim(),b=suB.value.trim();
+  if(!y&&!t&&!b)return;
+  standups.unshift({date:wr.today,y,t,b});DB.set('standups',standups);
+  suY.value=suT.value=suB.value='';renderStandup();
+}
+function renderStandup(){
+  suList.innerHTML=standups.length?standups.map(s=>`
+    <div class="log-item"><div class="d">${esc(s.date)}</div>
+    <p><b>어제</b> ${esc(s.y||'-')}\n<b>오늘</b> ${esc(s.t||'-')}\n<b>블로커</b> ${esc(s.b||'없음')}</p></div>`).join('')
+    :'<div class="empty">기록이 아직 없어요.</div>';
+}
+
+/* ---------- 회고 ---------- */
+function saveRetro(){
+  const k=rK.value.trim(),p=rP.value.trim(),t=rT.value.trim();
+  if(!k&&!p&&!t)return;
+  retros.unshift({week:wr.label,k,p,t});DB.set('retros',retros);
+  rK.value=rP.value=rT.value='';renderRetro();
+}
+function renderRetro(){
+  rList.innerHTML=retros.length?retros.map(r=>`
+    <div class="log-item"><div class="d">${esc(r.week)}</div>
+    <p><b>Keep</b> ${esc(r.k||'-')}\n<b>Problem</b> ${esc(r.p||'-')}\n<b>Try</b> ${esc(r.t||'-')}</p></div>`).join('')
+    :'<div class="empty">아직 회고가 없어요.</div>';
+}
+
+/* ---------- AI 코치 (Puter.js) ---------- */
+const SYSTEM=`너는 "라이프 스프린트 코치"다. 애자일/스크럼 방식을 개인의 일상에 적용해 사용자가 한 주를 스프린트처럼 계획·점검·회고하도록 돕는 한국어 코치다.
+- 거창한 목표보다 이번 주에 끝낼 작은 단위에 집중시킨다. 일을 작게 쪼개고 에너지 포인트(1·2·3·5)로 추정한다.
+- 스프린트 계획: 목표를 유저 스토리("나는 ~위해 ~하고 싶다")로 정리→태스크 분해→포인트 추정→완료기준(DoD)→스프린트 보드(표).
+- 데일리 스탠드업: 어제/오늘/블로커 3가지만 짧게. 블로커엔 해결책 제안.
+- 회고는 KPT(Keep/Problem/Try). 비난하지 않는다. 과부하면 덜어내도록 돕는다.
+- 친근하고 간결하게, 질문은 하나씩. 작은 성취도 칭찬한다.`;
+let history=[{role:'system',content:SYSTEM}];
+const chat=document.getElementById('chat');
+addBot('안녕하세요! 라이프 스프린트 코치예요 🚀\n무엇을 도와드릴까요? 아래 버튼으로 시작해도 좋아요.');
+
+function esc(s){return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function addUser(t){chat.insertAdjacentHTML('beforeend',`<div class="msg user">${esc(t)}</div>`);chat.scrollTop=chat.scrollHeight;}
+function addBot(t){chat.insertAdjacentHTML('beforeend',`<div class="msg bot">${esc(t)}</div>`);chat.scrollTop=chat.scrollHeight;}
+function quick(t){chatIn.value=t;send();}
+function aiRetro(){document.querySelector('[data-tab=coach]').click();quick('이번 주 회고를 KPT로 도와줘. 질문해줘.');}
+
+async function send(){
+  const text=chatIn.value.trim();if(!text)return;
+  chatIn.value='';addUser(text);history.push({role:'user',content:text});
+  const btn=document.getElementById('sendBtn');btn.disabled=true;
+  const tmp=document.createElement('div');tmp.className='msg bot';tmp.textContent='…';
+  chat.appendChild(tmp);chat.scrollTop=chat.scrollHeight;
+  try{
+    const resp=await puter.ai.chat(history,{model:'gpt-4o-mini'});
+    let out = typeof resp==='string'?resp:(resp?.message?.content ?? resp?.text ?? (resp?.toString?.()||''));
+    if(Array.isArray(out)) out=out.map(x=>x.text||'').join('');
+    tmp.remove();addBot(out);history.push({role:'assistant',content:out});
+  }catch(e){
+    tmp.remove();addBot('⚠ AI 응답을 불러오지 못했어요. 잠시 후 다시 시도하거나, 처음이라면 Puter 로그인 창을 완료했는지 확인해 주세요.');
+    console.error(e);
+  }finally{btn.disabled=false;}
+}
+
+/* ---------- 초기 렌더 ---------- */
+renderBoard();renderStandup();renderRetro();
+</script>
+</body>
+</html>
