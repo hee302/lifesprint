@@ -176,7 +176,7 @@
         <button class="chip" onclick="quick('오늘 데일리 스탠드업 도와줘')">데일리 스탠드업</button>
       </div>
       <div class="chat-in">
-        <input id="chatIn" type="text" placeholder="메시지를 입력하세요…" onkeydown="if(event.key==='Enter')send()">
+        <input id="chatIn" type="text" placeholder="메시지를 입력하세요…" onkeydown="if(event.key==='Enter'&&!event.isComposing){event.preventDefault();send();}">
         <button class="btn" onclick="send()" id="sendBtn">보내기</button>
       </div>
     </div>
